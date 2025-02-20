@@ -1,27 +1,53 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Controller, Get, Query, Param, Post, Body } from '@nestjs/common';
 
-@Controller('products') // Sera la ruta principal para acceder a cualquier controller /producto/...
+@Controller('products') // Ruta principal para acceder a cualquier controlador de productos
 export class ProductsController {
-  // @Get('products') // Ya no sera necesario establecer products en la ruta
   @Get() // Manejo de parámetros de consulta con conversión
   getProductByQuery(
-    @Query('limit') limit = 100, // Por defecto 100
-    @Query('offset') offset = 0, // Por defecto 0
+    @Query('limit') limit?: string, // Recibe como string
+    @Query('offset') offset?: string, // Recibe como string
     @Query('brand') brand?: string, // Opcional
   ) {
-    const parsedLimit = parseInt(limit.toString(), 10) || 0; // Convierte a número
-    const parsedOffset = parseInt(offset.toString(), 10) || 0; // Convierte a número
-    return `Products: limit => ${parsedLimit}, offset => ${parsedOffset}, brand => ${brand ?? 'not provided'}`;
+    // Convertir los valores a números, asegurando valores por defecto si hay errores
+    const parsedLimit =
+      limit && !isNaN(Number(limit)) ? parseInt(limit, 10) : 100;
+    const parsedOffset =
+      offset && !isNaN(Number(offset)) ? parseInt(offset, 10) : 0;
+
+    return {
+      success: true, // Generalmente en APIs se usa "success" en lugar de "Success"
+      message: 'Products retrieved successfully',
+      data: {
+        limit: parsedLimit,
+        offset: parsedOffset,
+        brand: brand ?? 'not provided',
+      },
+    };
   }
 
   // @Get('/products/filter') // Ya no sera necesario establecer products en la ruta
   @Get('filter') // Forma para definir el parametro
   getProductsFilter() {
-    return `Yo soy un filter`;
+    return {
+      success: true,
+      message: 'Yo soy un filter',
+    };
   }
 
   @Get(':productId') // Forma para definir el parametro
-  getProductsByParameters(@Param('productId') productId: string) {
-    return `product ${productId}`;
+  getByIdParameters(@Param('productId') productId: string) {
+    return {
+      success: true,
+      message: `Product ${productId} retrieved successfully`,
+    };
+  }
+
+  @Post()
+  create(@Body() payload: string) {
+    return {
+      success: true,
+      message: 'Accion de crear, ejecutada exitosamente',
+      payload,
+    };
   }
 }
