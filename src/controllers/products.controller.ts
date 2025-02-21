@@ -1,4 +1,15 @@
-import { Controller, Get, Query, Param, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 
 @Controller('products') // Ruta principal para acceder a cualquier controlador de productos
 export class ProductsController {
@@ -35,6 +46,7 @@ export class ProductsController {
   }
 
   @Get(':productId') // Forma para definir el parametro
+  @HttpCode(HttpStatus.ACCEPTED) // Cambiar el código de estado de la respuesta
   getByIdParameters(@Param('productId') productId: string) {
     return {
       success: true,
@@ -48,6 +60,24 @@ export class ProductsController {
       success: true,
       message: 'Accion de crear, ejecutada exitosamente',
       payload,
+    };
+  }
+
+  // Patch según RESTful es para actualizar parcialmente un recurso
+  @Put(':id')
+  update(@Param('id') id: number, @Body() payload: string) {
+    return {
+      success: true,
+      message: '¡Acción de actualizar, ejecutada exitosamente!',
+      payload,
+    };
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: number) {
+    return {
+      success: true,
+      message: `¡Acción de eliminar, ejecutada para el id ${id}!`,
     };
   }
 }
