@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Product } from '../entities/product.entity';
 
 // Se busca administrar en memoria los productos, aqui mismo se peude cargar los servicios en bases de datos
@@ -22,7 +22,11 @@ export class ProductsService {
   }
 
   findOne(id: number) {
-    return this.products.find((item) => item.id === id);
+    const product = this.products.find((item) => item.id === id);
+    if (!product) {
+      throw new NotFoundException(`Product #${id} not found`);
+    }
+    return { message: 'Product is found', product };
   }
 
   create(payload: any) {
@@ -48,15 +52,12 @@ export class ProductsService {
     return null;
   }
 
-  delete(id: number) {
-    const productFound = this.products.findIndex((item) => item.id === id);
-    let message = '';
-    if (productFound > 0) {
-      this.products.splice(productFound, 1);
-      message = 'Product deleted';
-    } else {
-      message = 'Product not found';
+  remove(id: number) {
+    const index = this.products.findIndex((item) => item.id === id);
+    if (index === -1) {
+      throw new NotFoundException(`Product #${id} not found`);
     }
-    return message;
+    this.products.splice(index, 1);
+    return true;
   }
 }
